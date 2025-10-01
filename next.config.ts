@@ -14,6 +14,7 @@ const CSP = [
   "upgrade-insecure-requests"
 ].join("; ");
 
+const COEP_VALUE = process.env.COEP_MODE === 'credentialless' ? 'credentialless' : 'require-corp';
 const nextConfig: NextConfig = {
   poweredByHeader: false,
 
@@ -86,4 +87,5 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
 
