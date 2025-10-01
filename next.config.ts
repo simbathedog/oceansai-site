@@ -1,5 +1,19 @@
 import type { NextConfig } from "next";
 
+const CSP = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "font-src 'self' data:",
+  "img-src 'self' data: https:",
+  "object-src 'none'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel.app",
+  "style-src 'self' 'unsafe-inline'",
+  "connect-src 'self' https://*.vercel.app https://vitals.vercel-insights.com",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "upgrade-insecure-requests"
+].join("; ");
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   async headers() {
@@ -12,10 +26,19 @@ const nextConfig: NextConfig = {
           { key: "Content-Type",  value: "application/xml; charset=utf-8" },
         ],
       },
-      // Global hardening
+      // Serve well-known security.txt as plain text with modest cache
+      {
+        source: "/.well-known/security.txt",
+        headers: [
+          { key: "Content-Type",  value: "text/plain; charset=utf-8" },
+          { key: "Cache-Control", value: "public, max-age=86400, s-maxage=86400" },
+        ],
+      },
+      // Global hardening + CSP
       {
         source: "/:path*",
         headers: [
+          { key: "Content-Security-Policy", value: CSP },
           { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains; preload" },
           { key: "X-Frame-Options",           value: "DENY" },
           { key: "X-Content-Type-Options",    value: "nosniff" },
