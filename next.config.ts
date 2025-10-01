@@ -16,37 +16,10 @@ const CSP = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+
   async headers() {
     return [
-      {
-        source: "/:path*",
-        headers: [
-          { key: "X-DNS-Prefetch-Control", value: "off" }
-        ],
-      },{
-        source: "/:path*",
-        headers: [
-          { key: "Origin-Agent-Cluster",              value: "?1" },
-          { key: "Cross-Origin-Resource-Policy",      value: "same-origin" },
-          { key: "X-Permitted-Cross-Domain-Policies", value: "none" }
-          // { key: "Cross-Origin-Opener-Policy",       value: "same-origin" }, // enable after testing popups/embeds
-        ],
-      },{
-        source: "/account",
-        headers: [
-          { key: "X-Robots-Tag", value: "noindex, nofollow" }
-        ],
-      },{
-        source: "/login",
-        headers: [
-          { key: "X-Robots-Tag", value: "noindex, nofollow" }
-        ],
-      },{
-        source: "/(login|account)",
-        headers: [
-          { key: "X-Robots-Tag", value: "noindex, nofollow" }
-        ],
-      },// Cache sitemap reasonably (1h) and ensure XML content-type
+      // Sitemap: cache + content type
       {
         source: "/sitemap.xml",
         headers: [
@@ -54,7 +27,7 @@ const nextConfig: NextConfig = {
           { key: "Content-Type",  value: "application/xml; charset=utf-8" },
         ],
       },
-      // Serve well-known security.txt as plain text with modest cache
+      // security.txt served as plain text
       {
         source: "/.well-known/security.txt",
         headers: [
@@ -62,7 +35,16 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=86400, s-maxage=86400" },
         ],
       },
-      // Global hardening + CSP
+      // Robots for auth pages
+      {
+        source: "/login",
+        headers: [ { key: "X-Robots-Tag", value: "noindex, nofollow" } ],
+      },
+      {
+        source: "/account",
+        headers: [ { key: "X-Robots-Tag", value: "noindex, nofollow" } ],
+      },
+      // Global hardening
       {
         source: "/:path*",
         headers: [
@@ -72,14 +54,25 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options",    value: "nosniff" },
           { key: "Referrer-Policy",           value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy",        value: "geolocation=(), microphone=(), camera=(), browsing-topics=()" },
+          { key: "Origin-Agent-Cluster",      value: "?1" },
+          { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+          { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+          { key: "X-DNS-Prefetch-Control",    value: "off" },
         ],
+      },
+    ];
+  },
+
+  // Canonical well-known redirect (temporary)
+  async redirects() {
+    return [
+      {
+        source: "/.well-known/change-password",
+        destination: "/account",
+        permanent: false, // 307
       },
     ];
   },
 };
 
 export default nextConfig;
-
-
-
-
