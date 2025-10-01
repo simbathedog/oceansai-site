@@ -19,7 +19,13 @@ const nextConfig: NextConfig = {
 
   async headers() {
     return [
-      // Sitemap: cache + content type
+      {
+        source: "/robots.txt",
+        headers: [
+          { key: "Content-Type",  value: "text/plain; charset=utf-8" },
+          { key: "Cache-Control", value: "public, max-age=3600, s-maxage=3600" }
+        ],
+      },// Sitemap: cache + content type
       {
         source: "/sitemap.xml",
         headers: [
@@ -58,7 +64,9 @@ const nextConfig: NextConfig = {
           { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
           { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
           { key: "X-DNS-Prefetch-Control",    value: "off" },
-        ],
+        
+          { key: "Cross-Origin-Opener-Policy",   value: "same-origin" },
+          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },],
       },
     ];
   },
@@ -67,6 +75,12 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/robots.txt",
+        headers: [
+          { key: "Content-Type",  value: "text/plain; charset=utf-8" },
+          { key: "Cache-Control", value: "public, max-age=3600, s-maxage=3600" }
+        ],
+      },{
         source: "/.well-known/change-password",
         destination: "/account",
         permanent: false, // 307
@@ -76,3 +90,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
