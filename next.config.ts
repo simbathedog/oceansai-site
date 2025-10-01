@@ -68,7 +68,7 @@ const nextConfig: NextConfig = {
           { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
           { key: "X-DNS-Prefetch-Control",    value: "off" },
           { key: "Cross-Origin-Opener-Policy",   value: "same-origin" },
-          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+          { key: "Cross-Origin-Embedder-Policy", value: COEP_VALUE },
         ],
       },
     ];
@@ -87,5 +87,6 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
 
 
