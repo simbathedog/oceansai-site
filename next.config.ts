@@ -18,7 +18,12 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   async headers() {
     return [
-      // Cache sitemap reasonably (1h) and ensure XML content-type
+      {
+        source: "/(login|account)",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" }
+        ],
+      },// Cache sitemap reasonably (1h) and ensure XML content-type
       {
         source: "/sitemap.xml",
         headers: [
@@ -43,7 +48,7 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options",           value: "DENY" },
           { key: "X-Content-Type-Options",    value: "nosniff" },
           { key: "Referrer-Policy",           value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy",        value: "geolocation=(), microphone=(), camera=()" },
+          { key: "Permissions-Policy",        value: "geolocation=(), microphone=(), camera=(), browsing-topics=()" },
         ],
       },
     ];
@@ -51,3 +56,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
