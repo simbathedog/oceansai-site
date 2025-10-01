@@ -19,6 +19,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/account",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" }
+        ],
+      },{
+        source: "/login",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" }
+        ],
+      },{
         source: "/(login|account)",
         headers: [
           { key: "X-Robots-Tag", value: "noindex, nofollow" }
@@ -56,4 +66,5 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
 

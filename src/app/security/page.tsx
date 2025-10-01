@@ -2,7 +2,7 @@ export default function SecurityPage() {
   return (
     <main style={{padding:'2rem',maxWidth:820,margin:'0 auto',lineHeight:1.6}}>
       <h1>Vulnerability Disclosure</h1>
-      <p>If you believe you've found a security issue affecting <strong>oceansai.org</strong>,
+      <p>If you believe you&#39;ve found a security issue affecting <strong>oceansai.org</strong>,
       please email <a href="mailto:security@oceansai.org">security@oceansai.org</a>. We aim to acknowledge new reports within 3 business days.</p>
       <h2>Scope</h2>
       <ul>
@@ -18,3 +18,4 @@ export default function SecurityPage() {
     </main>
   );
 }
+
