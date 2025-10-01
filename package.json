@@ -6,8 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint",
-    "postbuild": "next-sitemap --config next-sitemap.config.cjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
