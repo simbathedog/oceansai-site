@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://oceansai.org
+
+# Sitemaps
+Sitemap: https://oceansai.org/sitemap.xml
