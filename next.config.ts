@@ -19,6 +19,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: "/:path*",
+        headers: [
+          { key: "Origin-Agent-Cluster",              value: "?1" },
+          { key: "Cross-Origin-Resource-Policy",      value: "same-origin" },
+          { key: "X-Permitted-Cross-Domain-Policies", value: "none" }
+          // { key: "Cross-Origin-Opener-Policy",       value: "same-origin" }, // enable after testing popups/embeds
+        ],
+      },{
         source: "/account",
         headers: [
           { key: "X-Robots-Tag", value: "noindex, nofollow" }
@@ -66,5 +74,6 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
 
 
