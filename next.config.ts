@@ -19,13 +19,7 @@ const nextConfig: NextConfig = {
 
   async headers() {
     return [
-      {
-        source: "/robots.txt",
-        headers: [
-          { key: "Content-Type",  value: "text/plain; charset=utf-8" },
-          { key: "Cache-Control", value: "public, max-age=3600, s-maxage=3600" }
-        ],
-      },// Sitemap: cache + content type
+      // sitemap.xml: cache + explicit content-type
       {
         source: "/sitemap.xml",
         headers: [
@@ -33,7 +27,15 @@ const nextConfig: NextConfig = {
           { key: "Content-Type",  value: "application/xml; charset=utf-8" },
         ],
       },
-      // security.txt served as plain text
+      // robots.txt: cache + content-type (this was mis-placed before)
+      {
+        source: "/robots.txt",
+        headers: [
+          { key: "Content-Type",  value: "text/plain; charset=utf-8" },
+          { key: "Cache-Control", value: "public, max-age=3600, s-maxage=3600" },
+        ],
+      },
+      // well-known security.txt
       {
         source: "/.well-known/security.txt",
         headers: [
@@ -41,7 +43,7 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=86400, s-maxage=86400" },
         ],
       },
-      // Robots for auth pages
+      // keep auth pages out of search
       {
         source: "/login",
         headers: [ { key: "X-Robots-Tag", value: "noindex, nofollow" } ],
@@ -50,7 +52,7 @@ const nextConfig: NextConfig = {
         source: "/account",
         headers: [ { key: "X-Robots-Tag", value: "noindex, nofollow" } ],
       },
-      // Global hardening
+      // global hardening (includes COOP/COEP)
       {
         source: "/:path*",
         headers: [
@@ -61,33 +63,26 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy",           value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy",        value: "geolocation=(), microphone=(), camera=(), browsing-topics=()" },
           { key: "Origin-Agent-Cluster",      value: "?1" },
-          { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+          { key: "Cross-Origin-Resource-Policy",      value: "same-origin" },
           { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
           { key: "X-DNS-Prefetch-Control",    value: "off" },
-        
           { key: "Cross-Origin-Opener-Policy",   value: "same-origin" },
-          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },],
+          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+        ],
       },
     ];
   },
 
-  // Canonical well-known redirect (temporary)
+  // Canonical well-known redirect (temporary 307)
   async redirects() {
     return [
       {
-        source: "/robots.txt",
-        headers: [
-          { key: "Content-Type",  value: "text/plain; charset=utf-8" },
-          { key: "Cache-Control", value: "public, max-age=3600, s-maxage=3600" }
-        ],
-      },{
         source: "/.well-known/change-password",
         destination: "/account",
-        permanent: false, // 307
+        permanent: false,
       },
     ];
   },
 };
 
 export default nextConfig;
-
