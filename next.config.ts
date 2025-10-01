@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: [
+          { key: "X-DNS-Prefetch-Control", value: "off" }
+        ],
+      },{
+        source: "/:path*",
+        headers: [
           { key: "Origin-Agent-Cluster",              value: "?1" },
           { key: "Cross-Origin-Resource-Policy",      value: "same-origin" },
           { key: "X-Permitted-Cross-Domain-Policies", value: "none" }
@@ -74,6 +79,7 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
 
 
 
