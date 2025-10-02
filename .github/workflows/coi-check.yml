@@ -1,0 +1,19 @@
+name: COI check
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  headless-coi:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Runs your PowerShell headless COI checker (prefers Chrome, falls back to Edge).
+      # Use -BrowserChoice edge if you want to force Edge on the runner.
+      - name: Run COI headless check
+        shell: pwsh
+        run: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\coi-check.ps1 -Url 'https://oceansai.org/isolation' -ExpectCOEP require-corp
