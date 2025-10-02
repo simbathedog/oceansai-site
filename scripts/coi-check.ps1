@@ -12,17 +12,35 @@ function Get-BrowserPath([string]$choice){
   if ($choice -eq 'chrome' -or $choice -eq 'auto') {
     $cands += @(
       "$env:ProgramFiles\Google\Chrome\Application\chrome.exe",
-      "$env:ProgramFiles(x86)\Google\Chrome\Application\chrome.exe"
+      "$env:ProgramFiles(x86)\Google\Chrome\Application\chrome.exe",
+      "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe"
     )
+    try { $whereChrome = & where.exe chrome 2>$null; if ($whereChrome) { $cands += $whereChrome } } catch {}
   }
   if ($choice -eq 'edge' -or $choice -eq 'auto') {
     $cands += @(
+      "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe",
       "$env:ProgramFiles(x86)\Microsoft\Edge\Application\msedge.exe",
-      "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe"
+      "$env:LOCALAPPDATA\Microsoft\Edge\Application\msedge.exe",
+      "$env:ProgramFiles\Microsoft\Edge Beta\Application\msedge.exe",
+      "$env:ProgramFiles(x86)\Microsoft\Edge Beta\Application\msedge.exe",
+      "$env:LOCALAPPDATA\Microsoft\Edge Beta\Application\msedge.exe",
+      "$env:ProgramFiles\Microsoft\Edge Dev\Application\msedge.exe",
+      "$env:ProgramFiles(x86)\Microsoft\Edge Dev\Application\msedge.exe",
+      "$env:LOCALAPPDATA\Microsoft\Edge Dev\Application\msedge.exe"
     )
+    foreach ($rk in 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe',
+                      'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe') {
+      try {
+        $prop = Get-ItemProperty -LiteralPath $rk -ErrorAction SilentlyContinue
+        if ($prop.'(default)') { $cands += $prop.'(default)' }
+        elseif ($prop.Path)    { $cands += $prop.Path }
+      } catch {}
+    }
+    try { $whereEdge = & where.exe msedge 2>$null; if ($whereEdge) { $cands += $whereEdge } } catch {}
   }
-  foreach($p in $cands){ if (Test-Path $p) { return $p } }
-  throw "Need Edge or Chrome installed. Searched:`n$($cands -join "`n")"
+  foreach($p in ($cands | Where-Object { $_ } | Select-Object -Unique)) { if (Test-Path -LiteralPath $p) { return $p } }
+  throw "Need Edge or Chrome installed. Searched:`n$([string]::Join([Environment]::NewLine,$cands))"
 }
 
 function Get-FreePort([int]$start=9222,[int]$tries=50){
@@ -161,3 +179,4 @@ finally {
   Start-Sleep -Milliseconds 200
   try { Remove-Item -Recurse -Force $userDir -ErrorAction SilentlyContinue | Out-Null } catch {}
 }
+
