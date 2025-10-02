@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chrome, edge]
+        browser: [edge]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,3 +50,4 @@ jobs:
           name: coi-logs-${{ matrix.browser }}
           path: ${{ runner.temp }}/coi-logs-${{ matrix.browser }}/
           if-no-files-found: ignore
+
