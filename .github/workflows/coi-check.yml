@@ -11,16 +11,42 @@ jobs:
   headless-coi:
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         browser: [chrome, edge]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Google Chrome (if matrix says chrome)
+        if: matrix.browser == 'chrome'
+        shell: pwsh
+        run: choco install googlechrome --no-progress -y
+
       - name: Run COI headless check (${{ matrix.browser }})
         shell: pwsh
-        run: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass `
-          -File .\scripts\coi-check.ps1 `
-          -Url 'https://oceansai.org/isolation' `
-          -ExpectCOEP require-corp `
-          -BrowserChoice ${{ matrix.browser }}
+        run: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\scripts\coi-check.ps1 -Url 'https://oceansai.org/isolation' -ExpectCOEP require-corp -BrowserChoice ${{ matrix.browser }} -TimeoutSec 30
+
+      - name: Collect headless logs
+        if: always()
+        shell: pwsh
+        run: |
+          $logs = Get-ChildItem $env:TEMP -Recurse -Filter headless-*.log -ErrorAction SilentlyContinue
+          if ($logs) {
+            foreach ($f in $logs) {
+              Write-Host "::group::$($f.FullName)"
+              Get-Content $f.FullName
+              Write-Host "::endgroup::"
+            }
+          }
+          $out = Join-Path $env:RUNNER_TEMP "coi-logs-${{ matrix.browser }}"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          foreach ($f in $logs) { Copy-Item $f.FullName $out -Force }
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coi-logs-${{ matrix.browser }}
+          path: ${{ runner.temp }}/coi-logs-${{ matrix.browser }}/
+          if-no-files-found: ignore
