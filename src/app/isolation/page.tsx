@@ -7,11 +7,17 @@ export default function Isolation() {
   });
 
   useEffect(() => {
-    const coi = typeof globalThis !== "undefined" && (globalThis as any).crossOriginIsolated === true;
-    const sab = typeof SharedArrayBuffer !== "undefined";
-    const ua  = typeof navigator !== "undefined" ? navigator.userAgent : null;
-    setClient({ coi, sab, ua });
-  }, []);
+  // Type globalThis instead of casting to `any`
+  const gt = globalThis as typeof globalThis & { crossOriginIsolated?: boolean };
+
+  const coi =
+    typeof gt.crossOriginIsolated === "boolean" ? gt.crossOriginIsolated : null;
+
+  const sab = typeof SharedArrayBuffer !== "undefined";
+  const ua  = typeof navigator !== "undefined" ? navigator.userAgent : null;
+
+  setClient({ coi, sab, ua });
+}, []);
 
   return (
     <main style={{padding:"2rem",maxWidth:820,margin:"0 auto",lineHeight:1.6,fontFamily:"system-ui"}}>
@@ -23,3 +29,4 @@ export default function Isolation() {
     </main>
   );
 }
+
