@@ -1,0 +1,40 @@
+name: COI headers smoke
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: "0 3 * * *"   # nightly @ 03:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: coi-headers-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  headers-smoke:
+    name: headers-smoke
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check COOP/COEP on target
+        shell: pwsh
+        run: |
+          $url = 'https://oceansai.org/isolation'
+          Write-Host "Checking: $url"
+          $res = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30
+          $coop = $res.Headers['cross-origin-opener-policy']
+          $coep = $res.Headers['cross-origin-embedder-policy']
+          "COOP → $coop"
+          "COEP → $coep"
+
+          $coopOk = ($coop -eq 'same-origin')
+          $coepOk = @('require-corp','credentialless') -contains $coep
+
+          if (-not $coopOk -or -not $coepOk) {
+            Write-Error "COI headers failed: COOP='$coop' COEP='$coep'"
+            exit 1
+          }
+          Write-Host "COI headers OK ✅"
