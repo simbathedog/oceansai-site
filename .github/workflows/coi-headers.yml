@@ -30,12 +30,25 @@ jobs:
         run: |
           $url = "${env:DOMAIN}${{ matrix.path }}"
           Write-Host "Checking: $url"
-          $res = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30 -MaximumRedirection 5 -SkipHttpErrorCheck
+
+          $max=3; $delay=3; $res=$null
+          for($a=1;$a -le $max;$a++){
+            try {
+              $res = Invoke-WebRequest -Uri $url -TimeoutSec 30 -MaximumRedirection 5 -SkipHttpErrorCheck -ErrorAction Stop
+              break
+            } catch {
+              if ($a -eq $max) { throw }
+              Write-Warning "Attempt $a failed: $($_.Exception.Message). Retrying in ${delay}s…"
+              Start-Sleep -Seconds $delay
+            }
+          }
+
           $coop = ($res.Headers['cross-origin-opener-policy'] | Select-Object -First 1)
           $coep = ($res.Headers['cross-origin-embedder-policy'] | Select-Object -First 1)
           "Status → $($res.StatusCode) $($res.StatusDescription)"
           "COOP  → $coop"
           "COEP  → $coep"
+
           $coopOk = ($coop -eq 'same-origin')
           $coepOk = @('require-corp','credentialless') -contains $coep
           if (-not $coopOk -or -not $coepOk) {
