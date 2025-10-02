@@ -1,0 +1,26 @@
+name: COI check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  headless-coi:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        browser: [chrome, edge]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run COI headless check (${{ matrix.browser }})
+        shell: pwsh
+        run: pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass `
+          -File .\scripts\coi-check.ps1 `
+          -Url 'https://oceansai.org/isolation' `
+          -ExpectCOEP require-corp `
+          -BrowserChoice ${{ matrix.browser }}
